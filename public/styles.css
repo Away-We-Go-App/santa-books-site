@@ -1,0 +1,74 @@
+@font-face {
+  font-family: "EB Garamond";
+  src: url("assets/eb-garamond.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  background: #f7f0db;
+  color: #2f4937;
+  font-family: "EB Garamond", Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-width: 280px;
+  min-height: 100svh;
+  padding: clamp(32px, 5vh, 56px) 20px 24px;
+}
+
+.brand {
+  display: flex;
+  justify-content: center;
+}
+
+.brand img {
+  display: block;
+  width: clamp(190px, 22vw, 250px);
+  height: auto;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+h1 {
+  margin: clamp(36px, 6vh, 64px) 0 28px;
+  font-size: clamp(40px, 6.5vw, 82px);
+  line-height: 0.99;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.app-store {
+  display: block;
+  line-height: 0;
+}
+
+.app-store img {
+  display: block;
+  width: 180px;
+  height: auto;
+}
+
+.christmas-art {
+  display: block;
+  width: min(440px, 82vw);
+  height: auto;
+  margin-top: clamp(28px, 4vh, 44px);
+}
+
+@media (max-width: 480px) {
+  body { padding-inline: 14px; }
+  h1 { margin-bottom: 24px; }
+  .app-store img { width: 162px; }
+}
