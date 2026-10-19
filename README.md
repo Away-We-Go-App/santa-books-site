@@ -47,3 +47,27 @@ Policy/terms adapt the current Away We Go pages to Santa Books with verified
 contact, account/cloud and fulfillment-retention qualifications. See
 `docs/legal-publication-review.md` for source/evidence and review/deployment gates.
 Changing or publishing policy text requires task-specific authorization.
+
+## Homepage motion
+
+`public/home-motion.js` draws the approved clay reindeer/tree exchange from two
+local WebP assets (about 612 KiB combined). The character uses eight generated,
+registered whole-body poses; the face stays intact during the subtle upward
+glance. The tree answers with a star-led bow. Canvas is transparent so the scene
+blends into the existing homepage background.
+
+Snow spans the homepage viewport behind text and links with no pointer events.
+The pause button stops both scene and snow. Reduced-motion users start with a
+still scene and no snowfall; they can explicitly play the character animation.
+Hidden tabs suspend the animation, the offscreen scene skips drawing, and snow
+renders at up to 30 fps while clay poses update at 12 fps. The original image is
+the no-JavaScript / failed-asset fallback. Other pages do not load the script.
+
+Asset provenance: tree from the approved clay art; walk poses generated with the
+built-in image generation tool using that reindeer as the identity reference.
+The approved prototype supplied the pose registration, glance, and tree timing.
+
+Verification: `node --check public/home-motion.js`, `git diff --check`, and browser
+QA at 390 × 844 and 1440 × 1000 (also overflow checks at widths 320 and 768).
+Check pause/resume, reduced motion, blocked WebP fallback, disabled JavaScript,
+and the Privacy/Terms/Support links when changing this integration.
