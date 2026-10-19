@@ -40,9 +40,11 @@ Retention qualifications follow the coordinator's read-only
   cleanup retried; current-device cleanup is separate from other-device exports.
 - Accepted fulfillment retains order/contact/payment snapshots, recipient-bearing
   email records and print files containing printed photos/text, not merely a
-  postal address. Purge is 30 days after the latest required account-deletion,
-  payment, delivery or final recovery resolution. Stuck/unresolved work can delay
-  eligibility; the rule is not a maximum from tapping Delete.
+  postal address. Automatic purge eligibility is 30 days after the latest required
+  account-deletion, payment, delivery or final recovery resolution. Unresolved
+  work can delay eligibility; worker cleanup failures are retried and can delay
+  completion. The rule is not a maximum from tapping Delete or a guarantee that
+  erasure completes exactly at eligibility.
 - Minimal deletion/payment/tax replay references and immutable operational audit
   records survive, with no found coded TTL. Operational logs can retain IDs.
   No universal erasure, anonymization, fixed provider retention or automatic
