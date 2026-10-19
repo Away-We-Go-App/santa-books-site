@@ -54,14 +54,17 @@ Changing or publishing policy text requires task-specific authorization.
 local WebP assets (about 612 KiB combined). The character uses eight generated,
 registered whole-body poses; the face stays intact during the subtle upward
 glance. The tree answers with a star-led bow. Canvas is transparent so the scene
-blends into the existing homepage background.
+blends into the existing homepage background. The drawing surface spans the
+viewport; entrances and exits extend to the browser edges while the tree and
+character scale stay fixed.
 
 Snow spans the homepage viewport behind text and links with no pointer events.
-The pause button stops both scene and snow. Reduced-motion users start with a
-still scene and no snowfall; they can explicitly play the character animation.
+Reduced-motion users receive a still scene and no snowfall. There is no visible
+animation control.
 Hidden tabs suspend the animation, the offscreen scene skips drawing, and snow
-renders at up to 30 fps while clay poses update at 12 fps. The original image is
-the no-JavaScript / failed-asset fallback. Other pages do not load the script.
+renders at up to 30 fps while clay poses update at 12 fps. An exact first-frame poster uses the same geometry as the canvas, avoiding a
+composition/size jump during loading; it is also the no-JavaScript / failed-asset
+fallback. Other pages do not load the script.
 
 Asset provenance: tree from the approved clay art; walk poses generated with the
 built-in image generation tool using that reindeer as the identity reference.
@@ -69,5 +72,5 @@ The approved prototype supplied the pose registration, glance, and tree timing.
 
 Verification: `node --check public/home-motion.js`, `git diff --check`, and browser
 QA at 390 × 844 and 1440 × 1000 (also overflow checks at widths 320 and 768).
-Check pause/resume, reduced motion, blocked WebP fallback, disabled JavaScript,
+Check delayed-asset loading, reduced motion, blocked WebP fallback, disabled JavaScript,
 and the Privacy/Terms/Support links when changing this integration.

@@ -4,8 +4,7 @@
     ctx = canvas.getContext("2d");
   const snowfall = document.querySelector("#homepage-snow"),
     snowCtx = snowfall.getContext("2d");
-  const stage = document.querySelector(".christmas-stage"),
-    button = document.querySelector("#motion-toggle");
+  const stage = document.querySelector(".christmas-stage");
   if (!ctx || !snowCtx) return;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)"),
     sprites = {},
@@ -13,7 +12,7 @@
     TAU = Math.PI * 2;
   let paused = reduce.matches,
     ready = false,
-    elapsed = 5,
+    elapsed = 8,
     last = 0,
     raf = 0,
     lastScene = -1,
@@ -21,7 +20,16 @@
     inView = true;
   let snowWidth = 0,
     snowHeight = 0;
-  ctx.scale(2, 2);
+  let sceneWidth = 1000, sceneLeft = 0;
+  function resizeScene() {
+    const bounds = stage.getBoundingClientRect();
+    sceneWidth = bounds.width * 640 / bounds.height;
+    sceneLeft = (1000 - sceneWidth) / 2;
+    canvas.width = Math.round(sceneWidth * 2);
+    canvas.height = 1280;
+    ctx.setTransform(2, 0, 0, 2, -sceneLeft * 2, 0);
+    if (ready) draw(elapsed);
+  }
   function shadow(x, y, rx, ry, alpha) {
     ctx.save();
     ctx.translate(x, y);
@@ -151,7 +159,7 @@
   }
 
   function draw(t) {
-    ctx.clearRect(0, 0, 1000, 640);
+    ctx.clearRect(sceneLeft, 0, sceneWidth, 640);
     // Diffuse contact shadows establish the floor without a hard stage edge.
     shadow(500, 535, 222, 43, 0.14);
     shadow(500, 548, 350, 60, 0.035);
@@ -174,7 +182,11 @@
     } else {
       walkTime = clock - 7;
     }
-    const x = -120 + 62 * walkTime,
+    // Keep the meeting point fixed; extend entrances/exits to the viewport edges.
+    const extra = Math.max(0, (sceneWidth - 1000) / 2);
+    const x = walkTime <= 7
+      ? 314 - (434 + extra) * (1 - walkTime / 7)
+      : 314 + (806 + extra) * (walkTime - 7) / 13,
       feet = 580,
       scale = 0.24;
     // Hold the complete character pose on twos, including its travel, so feet stay planted.
@@ -228,10 +240,6 @@
     }
     snowCtx.globalAlpha = 1;
   }
-  function updateControl() {
-    button.textContent = paused ? "Play animation" : "Pause animation";
-    button.setAttribute("aria-pressed", String(paused));
-  }
   function tick(now) {
     raf = 0;
     if (paused || document.hidden) return;
@@ -252,13 +260,8 @@
     cancelAnimationFrame(raf);
     raf = 0;
     last = 0;
-    updateControl();
     if (ready && !paused && !document.hidden) raf = requestAnimationFrame(tick);
   }
-  button.addEventListener("click", () => {
-    paused = !paused;
-    sync();
-  });
   reduce.addEventListener("change", () => {
     paused = reduce.matches;
     if (paused) {
@@ -273,6 +276,7 @@
     "resize",
     () => {
       resizeSnow();
+      resizeScene();
       if (ready && !reduce.matches) drawSnow(elapsed);
     },
     { passive: true },
@@ -284,6 +288,7 @@
     { threshold: 0 },
   ).observe(stage);
   resizeSnow();
+  resizeScene();
   Promise.all(
     ["tree", "walk-views"].map(
       (name) =>
@@ -306,13 +311,12 @@
   )
     .then(() => {
       ready = true;
-      elapsed = paused ? 10.8 : 5;
+      elapsed = paused ? 10.8 : 8;
       draw(elapsed);
       stage.classList.add("motion-ready");
-      button.hidden = false;
       sync();
     })
     .catch(() => {
-      /* Keep the original static artwork if either asset cannot load. */
+      /* Keep the matching first-frame poster if either asset cannot load. */
     });
 })();
