@@ -120,8 +120,7 @@ a:focus-visible { outline: 3px solid #7a1f29; outline-offset: 5px; }
 
 /* Homepage-only motion. Information pages retain their static presentation. */
 .homepage { isolation: isolate; }
-.homepage .brand, .homepage h1, .homepage .app-store, .homepage .site-footer,
-#motion-toggle { position: relative; z-index: 2; }
+.homepage .brand, .homepage h1, .homepage .app-store, .homepage .site-footer { position: relative; z-index: 2; }
 #homepage-snow {
   position: fixed;
   inset: 0;
@@ -141,8 +140,6 @@ a:focus-visible { outline: 3px solid #7a1f29; outline-offset: 5px; }
   position: absolute;
   height: 100%;
   width: auto;
-  max-width: 100%;
-  object-fit: contain;
   margin: 0;
   left: 50%;
   transform: translateX(-50%);
@@ -157,20 +154,6 @@ a:focus-visible { outline: 3px solid #7a1f29; outline-offset: 5px; }
 }
 .motion-ready #christmas-scene { display: block; }
 .motion-ready .christmas-art { visibility: hidden; }
-#motion-toggle {
-  font: inherit;
-  font-size: 16px;
-  color: #2f4937;
-  background: #f7f0db;
-  border: 1px solid #2f493740;
-  border-radius: 24px;
-  padding: 10px 18px;
-  min-height: 44px;
-  cursor: pointer;
-}
-#motion-toggle[hidden] { display: none; }
-#motion-toggle:hover { border-color: #2f4937; }
-#motion-toggle:focus-visible { outline: 3px solid #7a1f29; outline-offset: 4px; }
 .homepage .site-footer { margin-top: 24px; }
 @media (max-width: 600px) {
   .christmas-stage { aspect-ratio: 1; }

@@ -8,6 +8,8 @@
     <title>Santa Books — Make Christmas Magic Last Forever</title>
     <link rel="icon" href="assets/wordmark.svg" type="image/svg+xml">
     <link rel="preload" href="assets/eb-garamond.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="/assets/christmas-motion/tree.webp" as="image">
+    <link rel="preload" href="/assets/christmas-motion/walk-views.webp" as="image">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body class="homepage">
@@ -24,13 +26,12 @@
              alt="Download on the App Store — link coming soon">
       </span>
       <div class="christmas-stage">
-        <img class="christmas-art" src="assets/christmas-art.png"
-             width="832" height="832" fetchpriority="high"
+        <img class="christmas-art" src="assets/christmas-motion/poster.webp"
+             width="2000" height="1280" fetchpriority="high"
              alt="A handmade clay Christmas tree with golden stars beside a reindeer in a red scarf">
         <canvas id="christmas-scene" width="2000" height="1280" role="img"
                 aria-label="A clay reindeer in a red scarf walks beside a handmade clay Christmas tree with golden stars, glances up, and the tree gently bows hello"></canvas>
       </div>
-      <button id="motion-toggle" type="button" aria-pressed="false" hidden>Pause animation</button>
     </main>
     <footer class="site-footer">
       <nav aria-label="Footer">

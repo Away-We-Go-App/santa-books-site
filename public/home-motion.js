@@ -4,8 +4,7 @@
     ctx = canvas.getContext("2d");
   const snowfall = document.querySelector("#homepage-snow"),
     snowCtx = snowfall.getContext("2d");
-  const stage = document.querySelector(".christmas-stage"),
-    button = document.querySelector("#motion-toggle");
+  const stage = document.querySelector(".christmas-stage");
   if (!ctx || !snowCtx) return;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)"),
     sprites = {},
@@ -13,7 +12,7 @@
     TAU = Math.PI * 2;
   let paused = reduce.matches,
     ready = false,
-    elapsed = 5,
+    elapsed = 8,
     last = 0,
     raf = 0,
     lastScene = -1,
@@ -228,10 +227,6 @@
     }
     snowCtx.globalAlpha = 1;
   }
-  function updateControl() {
-    button.textContent = paused ? "Play animation" : "Pause animation";
-    button.setAttribute("aria-pressed", String(paused));
-  }
   function tick(now) {
     raf = 0;
     if (paused || document.hidden) return;
@@ -252,13 +247,8 @@
     cancelAnimationFrame(raf);
     raf = 0;
     last = 0;
-    updateControl();
     if (ready && !paused && !document.hidden) raf = requestAnimationFrame(tick);
   }
-  button.addEventListener("click", () => {
-    paused = !paused;
-    sync();
-  });
   reduce.addEventListener("change", () => {
     paused = reduce.matches;
     if (paused) {
@@ -306,13 +296,12 @@
   )
     .then(() => {
       ready = true;
-      elapsed = paused ? 10.8 : 5;
+      elapsed = paused ? 10.8 : 8;
       draw(elapsed);
       stage.classList.add("motion-ready");
-      button.hidden = false;
       sync();
     })
     .catch(() => {
-      /* Keep the original static artwork if either asset cannot load. */
+      /* Keep the matching first-frame poster if either asset cannot load. */
     });
 })();
