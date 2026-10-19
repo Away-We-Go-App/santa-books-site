@@ -49,8 +49,9 @@ Retention qualifications follow the coordinator's read-only
   financial-record destruction is promised.
 - Stripe Customer cleanup does not erase all transaction history. Provider
   records/backups/logs, support correspondence and downloaded copies are separate.
-- Already-issued print-file URLs retain the existing up-to-30-minute expiry;
-  deleted accounts cannot create new links.
+- Already-issued print-file URLs may remain usable until their existing expiry;
+  deleted accounts cannot create new links. The source default of 1800 seconds
+  does not prove a universal maximum for all previously issued URLs.
 
 No raw report, customer record, provider configuration or key is included here.
 This is not an assertion that the policy satisfies every jurisdiction or that
