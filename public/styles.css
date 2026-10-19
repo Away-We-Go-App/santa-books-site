@@ -131,8 +131,8 @@ a:focus-visible { outline: 3px solid #7a1f29; outline-offset: 5px; }
 }
 .christmas-stage {
   position: relative;
-  width: min(620px, 100%);
-  aspect-ratio: 1000 / 640;
+  width: calc(100% + 40px);
+  height: min(396.8px, calc((100vw - 40px) * .64));
   margin-top: clamp(24px, 4vh, 40px);
   overflow: hidden;
 }
@@ -156,7 +156,10 @@ a:focus-visible { outline: 3px solid #7a1f29; outline-offset: 5px; }
 .motion-ready .christmas-art { visibility: hidden; }
 .homepage .site-footer { margin-top: 24px; }
 @media (max-width: 600px) {
-  .christmas-stage { aspect-ratio: 1; }
+  .christmas-stage { height: calc(100vw - 40px); }
+}
+@media (max-width: 480px) {
+  .christmas-stage { width: calc(100% + 28px); height: calc(100vw - 28px); }
 }
 @media (prefers-reduced-motion: reduce) {
   #homepage-snow { visibility: hidden; }

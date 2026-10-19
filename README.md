@@ -54,7 +54,9 @@ Changing or publishing policy text requires task-specific authorization.
 local WebP assets (about 612 KiB combined). The character uses eight generated,
 registered whole-body poses; the face stays intact during the subtle upward
 glance. The tree answers with a star-led bow. Canvas is transparent so the scene
-blends into the existing homepage background.
+blends into the existing homepage background. The drawing surface spans the
+viewport; entrances and exits extend to the browser edges while the tree and
+character scale stay fixed.
 
 Snow spans the homepage viewport behind text and links with no pointer events.
 Reduced-motion users receive a still scene and no snowfall. There is no visible
