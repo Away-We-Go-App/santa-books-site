@@ -1,6 +1,7 @@
 # Santa Books website
 
-A single static page for `thesantabooks.com`. No dependencies or build step.
+A static website for `thesantabooks.com`, with Privacy, Terms and Support pages.
+No dependencies or build step.
 
 ## Preview
 
@@ -32,3 +33,17 @@ Do not substitute an Away We Go URL or a guessed Apple app ID.
 The page uses Santa's cream background and evergreen wordmark ink. All assets
 are served locally. There are no analytics, third-party scripts, accounts, or
 connections to Away We Go services.
+
+
+## Information pages
+
+`public/privacy/index.html`, `public/terms/index.html` and
+`public/support/index.html` provide the extensionless destinations `/privacy`,
+`/terms` and `/support` (the static host may canonicalize their trailing slash).
+The homepage footer links to all three. The logo on each information page
+returns home. All pages use the same local font, colors and wordmark.
+
+Policy/terms adapt the current Away We Go pages to Santa Books with verified
+contact, account/cloud and fulfillment-retention qualifications. See
+`docs/legal-publication-review.md` for source/evidence and review/deployment gates.
+Changing or publishing policy text requires task-specific authorization.
