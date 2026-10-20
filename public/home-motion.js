@@ -55,6 +55,7 @@ import { createLegRig } from "./home-leg-rig.mjs";
     activity,
     headAngle = 0,
     attention = 0,
+    walkingNod = 0,
   ) {
     ctx.save();
     ctx.translate(x - 120, feet - 298);
@@ -66,7 +67,7 @@ import { createLegRig } from "./home-leg-rig.mjs";
       legRig.draw(ctx, distance, activity);
       ctx.restore();
     };
-    if (attention < 0.001) {
+    if (attention < 0.001 && Math.abs(walkingNod) < 0.00001) {
       draw();
     } else {
       ctx.save();
@@ -78,7 +79,7 @@ import { createLegRig } from "./home-leg-rig.mjs";
       ctx.restore();
       ctx.save();
       ctx.translate(267, 320);
-      ctx.rotate(headAngle);
+      ctx.rotate(headAngle + walkingNod);
       ctx.translate(-267, -320);
       ctx.beginPath();
       ctx.rect(0, 0, 384, 322);
@@ -167,7 +168,14 @@ import { createLegRig } from "./home-leg-rig.mjs";
     const distance = motion.x - route.meeting;
     tree(motion.story, feeling.hello);
     shadow(motion.x,580,74,10,.15);
-    deer(motion.x,580,distance,Math.min(1,motion.speed/route.speed),feeling.headAngle,feeling.attention);
+    const activity = Math.min(1, motion.speed / route.speed);
+    // An occasional soft nod, with a quiet interval between gestures. Reuse the
+    // greeting's neck pivot; planted feet and the body keep their exact motion.
+    const nodTime = (t + 0.8) % 7;
+    const nodEnvelope = nodTime < 2.4 ? Math.sin(Math.PI * nodTime / 2.4) ** 2 : 0;
+    const nod = 0.035 * nodEnvelope * Math.sin(TAU * nodTime / 2.4)
+      * activity * (1 - feeling.attention);
+    deer(motion.x,580,distance,activity,feeling.headAngle,feeling.attention,nod);
   }
 
   function resizeSnow() {

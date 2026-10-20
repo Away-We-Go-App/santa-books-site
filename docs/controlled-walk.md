@@ -20,6 +20,10 @@ While a hoof is planted, its local backward movement exactly cancels the body's
 forward travel. Smooth swing curves match contact velocity at both ends. Lift
 settles as travel slows, so all feet rest on the ground during the greeting.
 
+A gentle head nod uses the existing neck pivot during a 2.4-second window every
+seven seconds. Its smooth envelope and travel-speed weighting settle it at stops;
+it fades out during the tree glance. The leg cycle is unchanged.
+
 ## Rendering and limits
 
 Runtime canvas masks isolate the torso and reusable leg textures from the first

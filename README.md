@@ -55,7 +55,8 @@ WebP assets (about 671 KiB combined). `public/home-leg-rig.mjs` reuses the first
 approved pose: its head, scarf and torso remain stable while clipped leg textures
 move continuously. Hooves hold their ground position during stance; front/rear
 swings overlap in a four-beat walk. The closed-mouth glance and star-led tree bow
-retain their original timing. Canvas is transparent and spans the viewport.
+retain their original timing. A small, occasional head nod adds movement during
+walking and settles when the reindeer stops. Canvas is transparent and spans the viewport.
 
 Travel cruises at 38 CSS pixels per second with two-second starts/stops.
 `public/home-walk.mjs` owns the route; viewport width changes the loop duration.
