@@ -1,4 +1,5 @@
 import { createRoute, motionAt, retimeRoute } from "./home-walk.mjs";
+import { createLegRig } from "./home-leg-rig.mjs";
 
 (() => {
   "use strict";
@@ -21,7 +22,7 @@ import { createRoute, motionAt, retimeRoute } from "./home-walk.mjs";
     inView = true;
   let snowWidth = 0,
     snowHeight = 0;
-  let sceneWidth = 1000, sceneLeft = 0, route;
+  let sceneWidth = 1000, sceneLeft = 0, route, legRig;
   function resizeScene() {
     const bounds = stage.getBoundingClientRect();
     sceneWidth = bounds.width * 640 / bounds.height;
@@ -50,30 +51,23 @@ import { createRoute, motionAt, retimeRoute } from "./home-walk.mjs";
   function deer(
     x,
     feet,
-    phase,
-    moving,
+    distance,
+    activity,
     headAngle = 0,
     attention = 0,
+    walkingNod = 0,
   ) {
-    const frame =
-      moving > 0.01 ? ((Math.floor(phase * 12) % 12) + 12) % 12 : 0;
-    const im = sprites["walk-candidate"].im,
-      cw = im.width / 4,
-      ch = im.height / 3,
-      sx = (frame % 4) * cw,
-      sy = Math.floor(frame / 4) * ch;
-    // Registration offsets keep the generated poses on the same ground line.
-    const size = 0.6;
     ctx.save();
     ctx.translate(x - 120, feet - 298);
-    ctx.scale(size, size);
-    // Shared scale; measured eye anchors remove grid drift without resizing the head.
-    const eyeX = [246.14,234.81,221.69,204.61,246.97,234.78,222.57,204.14,247.28,234.58,222.66,207.70];
-    const floorY = [359,357,359,358,354,354,356,353,349,344,350,350];
-    const poseScale = 1.36;
-    const draw = () => ctx.drawImage(im, sx, sy, cw, ch,
-      264-eyeX[frame]*poseScale, 499-floorY[frame]*poseScale, cw*poseScale, ch*poseScale);
-    if (attention < 0.001) {
+    ctx.scale(.6, .6);
+    const draw = () => {
+      ctx.save();
+      ctx.translate(264 - 246.14 * 1.36, 499 - 359 * 1.36);
+      ctx.scale(1.36, 1.36);
+      legRig.draw(ctx, distance, activity);
+      ctx.restore();
+    };
+    if (attention < 0.001 && Math.abs(walkingNod) < 0.00001) {
       draw();
     } else {
       ctx.save();
@@ -85,7 +79,7 @@ import { createRoute, motionAt, retimeRoute } from "./home-walk.mjs";
       ctx.restore();
       ctx.save();
       ctx.translate(267, 320);
-      ctx.rotate(headAngle);
+      ctx.rotate(headAngle + walkingNod);
       ctx.translate(-267, -320);
       ctx.beginPath();
       ctx.rect(0, 0, 384, 322);
@@ -171,10 +165,17 @@ import { createRoute, motionAt, retimeRoute } from "./home-walk.mjs";
     const motion = motionAt(t, route);
     const feeling = emotion(motion.story);
     // Pose cadence follows travelled distance, including ease-in and ease-out.
-    const phase = (motion.x - route.meeting) / 76;
+    const distance = motion.x - route.meeting;
     tree(motion.story, feeling.hello);
     shadow(motion.x,580,74,10,.15);
-    deer(motion.x,580,phase,motion.speed>0.01?1:0,feeling.headAngle,feeling.attention);
+    const activity = Math.min(1, motion.speed / route.speed);
+    // An occasional soft nod, with a quiet interval between gestures. Reuse the
+    // greeting's neck pivot; planted feet and the body keep their exact motion.
+    const nodTime = (t + 0.8) % 7;
+    const nodEnvelope = nodTime < 2.4 ? Math.sin(Math.PI * nodTime / 2.4) ** 2 : 0;
+    const nod = 0.035 * nodEnvelope * Math.sin(TAU * nodTime / 2.4)
+      * activity * (1 - feeling.attention);
+    deer(motion.x,580,distance,activity,feeling.headAngle,feeling.attention,nod);
   }
 
   function resizeSnow() {
@@ -213,7 +214,7 @@ import { createRoute, motionAt, retimeRoute } from "./home-walk.mjs";
     if (paused || document.hidden) return;
     if (last) elapsed += Math.min((now - last) / 1000, 0.1);
     last = now;
-    const pose = Math.floor(elapsed * 12);
+    const pose = Math.floor(elapsed * 60);
     if (inView && pose !== lastScene) {
       draw(elapsed);
       lastScene = pose;
@@ -278,6 +279,7 @@ import { createRoute, motionAt, retimeRoute } from "./home-walk.mjs";
     ),
   )
     .then(() => {
+      legRig = createLegRig(sprites["walk-candidate"].im);
       ready = true;
       elapsed = paused ? 2.8 : 0;
       draw(elapsed);

@@ -1,0 +1,67 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Reindeer rendering regression checks</title>
+<pre id="result">Running…</pre>
+<script type="module">
+import { createLegRig } from '../public/home-leg-rig.mjs';
+const output = document.querySelector('#result');
+try {
+  const image = new Image();
+  image.src = '../public/assets/christmas-motion/walk-candidate.webp';
+  await image.decode();
+  const rig = createLegRig(image), canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 362;
+  const ctx = canvas.getContext('2d', {willReadFrequently: true});
+  const render = (distance, translate = false) => {
+    ctx.clearRect(0,0,362,362);
+    ctx.save();
+    if (translate) ctx.translate(distance / .816,0);
+    rig.draw(ctx,distance);
+    ctx.restore();
+  };
+  let worstDetached = 0;
+  for (let step=0; step<112; step++) {
+    render(step*.5);
+    const pixels = ctx.getImageData(0,0,362,362).data;
+    const seen = new Uint8Array(362*362), queue = [150*362+240];
+    if (pixels[queue[0]*4+3] < 128) throw new Error('Head anchor is empty');
+    seen[queue[0]] = 1;
+    for (let i=0; i<queue.length; i++) {
+      const k=queue[i], x=k%362, y=Math.floor(k/362);
+      const neighbors=[];
+      if(x>0) neighbors.push(k-1); if(x<361) neighbors.push(k+1);
+      if(y>0) neighbors.push(k-362); if(y<361) neighbors.push(k+362);
+      for (const n of neighbors) if (!seen[n] && pixels[n*4+3]>=128) {
+        seen[n]=1; queue.push(n);
+      }
+    }
+    let detached=0;
+    for(let y=300;y<362;y++) for(let x=40;x<330;x++) {
+      const k=y*362+x;
+      if(pixels[k*4+3]>=128 && !seen[k]) detached++;
+    }
+    worstDetached=Math.max(worstDetached,detached);
+  }
+  if (worstDetached) throw new Error(`${worstDetached} detached lower-leg pixels`);
+
+  render(0,true);
+  const before=ctx.getImageData(210,342,55,20).data;
+  const visible=before.filter((v,i)=>i%4===3 && v>128).length;
+  if (visible<100) throw new Error('Hoof comparison region is empty');
+  render(4,true);
+  const after=ctx.getImageData(210,342,55,20).data;
+  const maxHoofDifference=Math.max(...before.map((v,i)=>Math.abs(v-after[i])));
+  if (maxHoofDifference>1) throw new Error(`Planted hoof changed by ${maxHoofDifference}`);
+
+  render(0);
+  const head=ctx.getImageData(0,0,362,240).data;
+  render(28);
+  const otherHead=ctx.getImageData(0,0,362,240).data;
+  if (head.some((v,i)=>v!==otherHead[i])) throw new Error('Head texture changed during gait');
+  output.textContent=JSON.stringify({passed:true,poses:112,worstDetached,maxHoofDifference,visibleHoofPixels:visible,stableHead:true},null,2);
+  document.title='PASS — Reindeer rendering';
+} catch(error) {
+  output.textContent=error.stack;
+  document.title='FAIL — Reindeer rendering';
+}
+</script>
