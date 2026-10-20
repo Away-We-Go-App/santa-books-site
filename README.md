@@ -51,12 +51,14 @@ Changing or publishing policy text requires task-specific authorization.
 ## Homepage motion
 
 `public/home-motion.js` draws the approved clay reindeer/tree exchange from two
-local WebP assets (about 612 KiB combined). The character uses eight generated,
+local WebP assets (about 671 KiB combined). The character uses twelve generated,
 registered whole-body poses; the face stays intact during the subtle upward
 glance. The tree answers with a star-led bow. Canvas is transparent so the scene
 blends into the existing homepage background. The drawing surface spans the
 viewport; entrances and exits extend to the browser edges while the tree and
-character scale stay fixed.
+character scale stay fixed. Travel cruises at 38 CSS pixels per second, with
+two-second acceleration/deceleration and distance-driven pose selection.
+`public/home-walk.mjs` owns this route; viewport width changes the loop duration.
 
 Snow spans the homepage viewport behind text and links with no pointer events.
 Reduced-motion users receive a still scene and no snowfall. There is no visible
@@ -70,7 +72,10 @@ Asset provenance: tree from the approved clay art; walk poses generated with the
 built-in image generation tool using that reindeer as the identity reference.
 The approved prototype supplied the pose registration, glance, and tree timing.
 
-Verification: `node --check public/home-motion.js`, `git diff --check`, and browser
+Candidate provenance and limitations: [walk candidate](docs/walk-candidate.md).
+
+Verification: `node --test tests/home-walk.test.mjs`,
+`node --check public/home-motion.js`, `git diff --check`, and browser
 QA at 390 × 844 and 1440 × 1000 (also overflow checks at widths 320 and 768).
 Check delayed-asset loading, reduced motion, blocked WebP fallback, disabled JavaScript,
 and the Privacy/Terms/Support links when changing this integration.
