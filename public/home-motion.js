@@ -1,3 +1,5 @@
+import { createRoute, motionAt, retimeRoute } from "./home-walk.mjs";
+
 (() => {
   "use strict";
   const canvas = document.querySelector("#christmas-scene"),
@@ -8,11 +10,10 @@
   if (!ctx || !snowCtx) return;
   const reduce = matchMedia("(prefers-reduced-motion: reduce)"),
     sprites = {},
-    CYCLE = 27,
     TAU = Math.PI * 2;
   let paused = reduce.matches,
     ready = false,
-    elapsed = 8,
+    elapsed = 0,
     last = 0,
     raf = 0,
     lastScene = -1,
@@ -20,11 +21,14 @@
     inView = true;
   let snowWidth = 0,
     snowHeight = 0;
-  let sceneWidth = 1000, sceneLeft = 0;
+  let sceneWidth = 1000, sceneLeft = 0, route;
   function resizeScene() {
     const bounds = stage.getBoundingClientRect();
     sceneWidth = bounds.width * 640 / bounds.height;
     sceneLeft = (1000 - sceneWidth) / 2;
+    const nextRoute = createRoute(sceneLeft, sceneWidth, bounds.height / 640);
+    elapsed = retimeRoute(elapsed, route, nextRoute);
+    route = nextRoute;
     canvas.width = Math.round(sceneWidth * 2);
     canvas.height = 1280;
     ctx.setTransform(2, 0, 0, 2, -sceneLeft * 2, 0);
@@ -52,10 +56,10 @@
     attention = 0,
   ) {
     const frame =
-      moving > 0.01 ? ((Math.floor((phase + 1 / 24) * 8) % 8) + 8) % 8 : 0;
-    const im = sprites["walk-views"].im,
+      moving > 0.01 ? ((Math.floor(phase * 12) % 12) + 12) % 12 : 0;
+    const im = sprites["walk-candidate"].im,
       cw = im.width / 4,
-      ch = im.height / 2,
+      ch = im.height / 3,
       sx = (frame % 4) * cw,
       sy = Math.floor(frame / 4) * ch;
     // Registration offsets keep the generated poses on the same ground line.
@@ -63,11 +67,12 @@
     ctx.save();
     ctx.translate(x - 120, feet - 298);
     ctx.scale(size, size);
-    ctx.translate(
-      [0, 8, 2, 6, 6, 12, 8, 10][frame],
-      [0, 5, -1, -1, 17, 26, 24, 24][frame],
-    );
-    const draw = () => ctx.drawImage(im, sx, sy, cw, ch, 0, 0, 384, 512);
+    // Shared scale; measured eye anchors remove grid drift without resizing the head.
+    const eyeX = [246.14,234.81,221.69,204.61,246.97,234.78,222.57,204.14,247.28,234.58,222.66,207.70];
+    const floorY = [359,357,359,358,354,354,356,353,349,344,350,350];
+    const poseScale = 1.36;
+    const draw = () => ctx.drawImage(im, sx, sy, cw, ch,
+      264-eyeX[frame]*poseScale, 499-floorY[frame]*poseScale, cw*poseScale, ch*poseScale);
     if (attention < 0.001) {
       draw();
     } else {
@@ -96,7 +101,7 @@
     return u * u * (3 - 2 * u);
   }
   function emotion(t) {
-    const clock = Math.floor((((t % CYCLE) + CYCLE) % CYCLE) * 12) / 12;
+    const clock = Math.floor(t * 12) / 12;
     const anticipate =
       smooth(8.0, 8.25, clock) * (1 - smooth(8.3, 8.65, clock));
     const look = smooth(8.55, 9.55, clock) * (1 - smooth(12.25, 13.2, clock));
@@ -111,7 +116,7 @@
     };
   }
   function tree(t, hello) {
-    const clock = Math.floor((((t % CYCLE) + CYCLE) % CYCLE) * 12) / 12;
+    const clock = Math.floor(t * 12) / 12;
     const bow = (delay) =>
       smooth(9.7 + delay, 10.65 + delay, clock) *
       (1 - smooth(11.35 + delay, 12.65 + delay, clock));
@@ -163,50 +168,13 @@
     // Diffuse contact shadows establish the floor without a hard stage edge.
     shadow(500, 535, 222, 43, 0.14);
     shadow(500, 548, 350, 60, 0.035);
-    const clock = Math.floor((((t % CYCLE) + CYCLE) % CYCLE) * 12) / 12;
-    let walkTime,
-      pace = 1;
-    if (clock < 6) {
-      walkTime = clock;
-    } else if (clock < 8) {
-      const u = (clock - 6) / 2;
-      walkTime = 6 + 2 * u - u * u;
-      pace = 1 - u;
-    } else if (clock < 13) {
-      walkTime = 7;
-      pace = 0;
-    } else if (clock < 15) {
-      const u = (clock - 13) / 2;
-      walkTime = 7 + u * u;
-      pace = u;
-    } else {
-      walkTime = clock - 7;
-    }
-    // Keep the meeting point fixed; extend entrances/exits to the viewport edges.
-    const extra = Math.max(0, (sceneWidth - 1000) / 2);
-    const x = walkTime <= 7
-      ? 314 - (434 + extra) * (1 - walkTime / 7)
-      : 314 + (806 + extra) * (walkTime - 7) / 13,
-      feet = 580,
-      scale = 0.24;
-    // Hold the complete character pose on twos, including its travel, so feet stay planted.
-    const speed = pace * 62,
-      distance = x + 120,
-      phase = distance / ((152 * scale) / 0.76) - 1 / 24;
-    const feeling = emotion(t);
-    const actor = () => {
-      shadow(x, feet, (62 * scale) / 0.2, 10, 0.15);
-      deer(
-        x,
-        feet,
-        phase,
-        Math.min(1, speed / 25),
-        feeling.headAngle,
-        feeling.attention,
-      );
-    };
-    tree(t, feeling.hello);
-    actor();
+    const motion = motionAt(t, route);
+    const feeling = emotion(motion.story);
+    // Pose cadence follows travelled distance, including ease-in and ease-out.
+    const phase = (motion.x - route.meeting) / 76;
+    tree(motion.story, feeling.hello);
+    shadow(motion.x,580,74,10,.15);
+    deer(motion.x,580,phase,motion.speed>0.01?1:0,feeling.headAngle,feeling.attention);
   }
 
   function resizeSnow() {
@@ -265,7 +233,7 @@
   reduce.addEventListener("change", () => {
     paused = reduce.matches;
     if (paused) {
-      elapsed = 10.8;
+      elapsed = 2.8;
       if (ready) draw(elapsed);
       snowCtx.clearRect(0, 0, snowWidth, snowHeight);
     }
@@ -290,7 +258,7 @@
   resizeSnow();
   resizeScene();
   Promise.all(
-    ["tree", "walk-views"].map(
+    ["tree", "walk-candidate"].map(
       (name) =>
         new Promise((resolve, reject) => {
           const im = new Image();
@@ -311,7 +279,7 @@
   )
     .then(() => {
       ready = true;
-      elapsed = paused ? 10.8 : 8;
+      elapsed = paused ? 2.8 : 0;
       draw(elapsed);
       stage.classList.add("motion-ready");
       sync();
