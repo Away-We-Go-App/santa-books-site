@@ -1,7 +1,7 @@
 # Santa Books website
 
 A static website for `thesantabooks.com`, with Privacy, Terms and Support pages.
-No dependencies or build step.
+No package installation or build step.
 
 ## Preview
 
@@ -47,6 +47,26 @@ Policy/terms adapt the current Away We Go pages to Santa Books with verified
 contact, account/cloud and fulfillment-retention qualifications. See
 `docs/legal-publication-review.md` for source/evidence and review/deployment gates.
 Changing or publishing policy text requires task-specific authorization.
+
+## Order email links
+
+`/orders/#<purchase UUID>` is a generic, no-index landing page for order-email
+links. iPhone and iPad open the native order link. Desktop browsers display
+the short order reference and a locally generated QR code for the same HTTPS
+link. A phone that scans the code can open the matching purchase in the signed-in
+account. The full UUID stays in the fragment and is never sent to the website.
+Invalid references open the Orders list. The manual Settings → Orders route
+and support link work with JavaScript disabled. The page does not fetch
+purchase, recipient, shipment or payment data.
+
+The browser-only QR encoder is the unmodified `nano.mjs` from
+[`lean-qr` 2.7.4](https://www.npmjs.com/package/lean-qr/v/2.7.4).
+Its MIT license is included in `public/vendor/lean-qr-LICENSE.txt`.
+
+`public/assets/santa-books-mail.png` is the existing clay tree and reindeer art
+resized to 260 × 266 pixels for a 130-pixel-wide, 2× email display.
+`public/assets/santa-books-wordmark-mail.png` is a 440 × 75 pixel PNG exported
+directly from the native app's outlined `SantaBooksWordmark` SVG for email use.
 
 ## Homepage motion
 

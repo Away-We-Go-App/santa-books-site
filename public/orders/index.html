@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f0db">
+    <meta name="description" content="Open Santa Books to view your order.">
+    <meta name="robots" content="noindex, nofollow">
+    <title>View your order — Santa Books</title>
+    <link rel="icon" href="/assets/wordmark.svg" type="image/svg+xml">
+    <link rel="preload" href="/assets/eb-garamond.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="/assets/santa-books-mail.png" as="image">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body class="order-page">
+    <header class="brand">
+      <a href="/" aria-label="Santa Books home">
+        <img src="/assets/wordmark.svg" width="200" height="34" alt="Santa Books">
+      </a>
+    </header>
+    <main class="order-landing">
+      <img class="order-art" src="/assets/santa-books-mail.png" width="260" height="266" alt="">
+      <p id="order-reference" class="order-reference" hidden></p>
+      <h1 id="order-heading">Your Santa Books order</h1>
+      <p id="order-status" class="order-status">Open Santa Books on your iPhone or iPad and choose Settings → Orders.</p>
+      <canvas id="order-qr" class="order-qr" role="img" aria-label="Scan to open your Santa Books order on iPhone or iPad" hidden></canvas>
+      <a id="open-santa-books" class="order-open-button" href="santabooks://orders" hidden>Open Santa Books</a>
+      <p id="order-fallback" class="order-help" hidden>Or open Santa Books and choose Settings → Orders.</p>
+      <a class="order-support" href="/support/">Get help with your order</a>
+    </main>
+    <footer class="site-footer">
+      <nav aria-label="Footer">
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/support">Support</a>
+      </nav>
+      <p>© 2026 Santa Books</p>
+    </footer>
+    <script src="/order-link.js"></script>
+  </body>
+</html>
