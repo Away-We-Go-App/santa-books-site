@@ -60,6 +60,7 @@ for (const [engine, browserType] of Object.entries({ chromium, webkit })) {
       await page.getByText('Use a name or nickname up to 60 characters.').waitFor();
       assert.equal(ids.length, 0);
       await page.locator('#name').fill('June');
+      assert.equal(await page.locator('#consent').innerText(), 'Alex will receive a copy of each photo to keep and use in their Christmas book.');
       await page.locator('#send').click();
       await page.getByRole('button', { name: 'Retry 1 photo', exact: true }).click();
       await page.locator('#again').waitFor();

@@ -140,7 +140,7 @@ async function openInvite() {
     owner = info.ownerName && info.ownerName !== 'A Santa Books family' ? String(info.ownerName) : 'the organizer';
     el('occasion').textContent = `Christmas ${info.year}`;
     el('intro').textContent = owner === 'the organizer' ? 'You’ve been invited to share photos for a Christmas book.' : `${owner} is collecting photos for a Christmas book.`;
-    el('consent').textContent = `${owner === 'the organizer' ? 'The organizer' : owner} can keep and print these copies. You can’t take them back after sending.`;
+    el('consent').textContent = `${owner === 'the organizer' ? 'The organizer' : owner} will receive a copy of each photo to keep and use in their Christmas book.`;
     el('request').hidden = false;
     render();
   } catch (error) {
