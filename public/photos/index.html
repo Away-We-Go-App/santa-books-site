@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#fcf7ee">
+  <meta name="description" content="Share your Christmas photos with the person who invited you.">
+  <meta property="og:title" content="A Christmas photo request">
+  <meta property="og:image" content="https://thesantabooks.com/assets/christmas-motion/poster.webp">
+  <title>Christmas photo request · Santa Books</title>
+  <link rel="icon" href="/assets/wordmark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./photos.css">
+</head>
+<body>
+  <main>
+    <img class="wordmark" src="/assets/wordmark.svg" alt="Santa Books">
+    <img class="art" src="/assets/christmas-motion/poster.webp" alt="" width="2000" height="1280">
+    <h1 id="occasion">Christmas photos</h1>
+    <p id="intro">Opening your invitation…</p>
+    <noscript>Turn on JavaScript to choose and send photos.</noscript>
+    <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <form id="request" hidden>
+      <input id="files" type="file" multiple accept="image/*" hidden>
+      <div id="selection-summary" hidden>
+        <span id="selection-count" aria-live="polite"></span>
+        <button type="button" id="selection-toggle" aria-controls="selection" aria-expanded="false" hidden>Show all</button>
+      </div>
+      <div id="review" hidden>
+        <label for="name">Your name or nickname</label>
+        <input id="name" type="text" autocomplete="given-name" autocapitalize="words" required aria-describedby="name-error">
+        <span id="name-error" role="alert"></span>
+        <p id="consent"></p>
+        <button id="send" type="submit">Send photos</button>
+      </div>
+      <ul id="selection" aria-label="Selected photos"></ul>
+      <button type="button" id="choose">Choose photos</button>
+    </form>
+    <button id="again" type="button" hidden>Send more photos</button>
+    <button id="reload" type="button" hidden>Try again</button>
+  </main>
+  <script src="./photos.mjs" type="module"></script>
+</body></html>

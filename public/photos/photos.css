@@ -1,0 +1,28 @@
+@font-face { font-family: Garamond; src: url("/assets/eb-garamond.ttf") format("truetype"); font-display: swap; }
+:root { color-scheme: light; background: #fcf7ee; color: #183f33; font: 17px/1.48 system-ui, sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 29rem; margin: 0 auto; padding: 2rem 1.3rem 3rem; }
+.wordmark { display: block; width: 10.5rem; height: auto; }
+.art { display: block; width: 11.5rem; height: auto; margin: 1.7rem 0 .6rem; }
+h1 { font: 500 clamp(2.5rem, 9vw, 3.6rem)/1.04 Garamond, Georgia, serif; margin: .6rem 0; }
+p { margin: .8rem 0 1.2rem; }
+button, input { font: inherit; }
+button { border: 0; cursor: pointer; border-radius: .8rem; padding: .8rem 1.1rem; background: #124b39; color: white; font-weight: 600; min-height: 46px; width: 100%; }
+button:disabled { opacity: .6; }
+:focus-visible { outline: 3px solid #a23c2b; outline-offset: 3px; }
+#selection { list-style: none; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .7rem; padding: 0; }
+#selection:empty { display: none; }
+#selection-summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1rem 0 .7rem; font-weight: 600; }
+#selection-toggle { width: auto; min-height: 44px; padding: .45rem .75rem; background: transparent; border: 1px solid #647a68; color: #183f33; white-space: nowrap; }
+#selection li { min-width: 0; position: relative; }
+#selection img { width: 100%; aspect-ratio: 1; border-radius: .6rem; object-fit: cover; display: block; background: #e9e2d4; }
+#selection button { position: absolute; right: 0; top: 0; width: 44px; height: 44px; min-height: 44px; padding: 0; color: white; background: radial-gradient(circle, #212820 0 43%, transparent 47%); font-size: 21px; }
+#selection small { display: block; margin-top: .25rem; font-size: .8rem; }
+label { display: block; font-weight: 600; margin-top: 1.2rem; }
+input[type=text] { margin-top: .3rem; padding: .7rem; border: 1px solid #9caa99; background: white; border-radius: .5rem; width: 100%; color: #122d22; }
+#name-error { color: #8a2b22; }
+#review p { font-size: .92rem; }
+#status:not(:empty) { border-left: 4px solid #b88932; padding: .65rem .8rem; background: #f4ead6; color: #122d22; font-weight: 600; white-space: pre-line; }
+#choose.secondary, #again, #reload { background: transparent; border: 1px solid #647a68; color: #183f33; }
+[hidden] { display: none !important; }

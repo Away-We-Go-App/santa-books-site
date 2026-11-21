@@ -1,7 +1,7 @@
 # Santa Books website
 
-A static website for `thesantabooks.com`, with Privacy, Terms and Support pages.
-No package installation or build step.
+A static website for `thesantabooks.com`, with Privacy, Terms, Support and guest photo requests.
+The site has no package dependencies. Its build writes the public Santa relay addresses used by invitations.
 
 ## Preview
 
@@ -11,7 +11,7 @@ Open <http://localhost:4179>.
 ## Vercel
 
 Use a dedicated Santa Books project with root directory `.` (the repository root),
-framework **Other**, no build command, and output directory `public`.
+framework **Other**, build command `node scripts/build-photo-config.mjs`, and output directory `public`.
 The checked-in `vercel.json` supplies the build/output settings. Domain connection
 and production publication require approval; neither is performed by these files.
 
@@ -34,6 +34,14 @@ The page uses Santa's cream background and evergreen wordmark ink. All assets
 are served locally. There are no analytics, third-party scripts, accounts, or
 connections to Away We Go services.
 
+## Guest photo requests
+
+The Santa Books app shares `/photos/#production/<token>` or `/photos/#staging/<token>`. The fragment stays in the browser. Link previews fetch generic Christmas artwork. The guest can choose photos in a mobile browser, review their selection, and send JPEG copies for temporary pickup.
+
+Set `SANTA_PHOTO_PROJECT_PRODUCTION` or `SANTA_PHOTO_PROJECT_STAGING` to the respective Santa Supabase **public project reference** in the website build environment, then build. Missing environments disable only their invitations. Do not put API keys or service credentials in these variables. The browser contacts only the relay selected in the built configuration. It never takes a destination URL from a guest link. Guest photos go directly to the Santa transfer service. The website host does not receive the uploads.
+
+The guest page initially shows six thumbnails. Pending selections stay in memory for retry. The page releases them when the batch finishes or the request closes. The browser decodes supported still images, preserves aspect ratio and orientation, strips embedded metadata including location, and sends a JPEG up to 5,200 pixels on the long edge. For a trusted JPEG, it carries forward only the original capture date in a fresh date-only tag. For a format the phone cannot open, the guest can choose a JPEG or PNG copy. A retry reuses the same submission ID and bytes. Rate-limited uploads automatically resume at most twice for the current photo after the relay’s `Retry-After` delay. A successful upload resets that limit for the next photo. The receipt distinguishes acknowledged uploads from photos that still need attention and shows the pickup deadline returned by the relay. Deploy the Santa app backend and verify cleanup before enabling a website environment.
+
 
 ## Information pages
 
@@ -47,6 +55,8 @@ Policy/terms adapt the current Away We Go pages to Santa Books with verified
 contact, account/cloud and fulfillment-retention qualifications. See
 `docs/legal-publication-review.md` for source/evidence and review/deployment gates.
 Changing or publishing policy text requires task-specific authorization.
+
+For the guest regression check, install Playwright and its Chromium and WebKit browsers outside the static publication directory. With that installation on Node's module resolution path, run `node --test tests/photo-request.browser.cjs`. Set `CHROME_CHANNEL=chrome` to use an installed Google Chrome. The test starts its own loopback server and substitutes the transfer endpoint.
 
 ## Order email links
 

@@ -2,3 +2,4 @@
 .playwright-cli/
 output/
 .DS_Store
+public/photos/relay.json
