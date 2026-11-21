@@ -48,6 +48,20 @@ contact, account/cloud and fulfillment-retention qualifications. See
 `docs/legal-publication-review.md` for source/evidence and review/deployment gates.
 Changing or publishing policy text requires task-specific authorization.
 
+## Order email links
+
+`/orders/#<purchase UUID>` is a generic, no-index landing page for order-email
+links. The UUID stays in the URL fragment, is never rendered into the public
+page content or sent to the site server, and is used only to open
+`santabooks://orders/<purchase UUID>`. Invalid or
+legacy identifiers fall back to the app's Orders list. The public page contains
+no order, account, recipient, shipment or payment data.
+
+`public/assets/santa-books-mail.png` is the existing clay tree and reindeer art
+resized to 260 × 266 pixels for a 130-pixel-wide, 2× email display.
+`public/assets/santa-books-wordmark-mail.png` is a 440 × 75 pixel PNG exported
+directly from the native app's outlined `SantaBooksWordmark` SVG for email use.
+
 ## Homepage motion
 
 `public/home-motion.js` draws the clay reindeer/tree exchange from two local

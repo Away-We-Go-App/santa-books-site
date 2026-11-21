@@ -164,3 +164,86 @@ a:focus-visible { outline: 3px solid #7a1f29; outline-offset: 5px; }
 @media (prefers-reduced-motion: reduce) {
   #homepage-snow { visibility: hidden; }
 }
+
+.order-page {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: #f7f0db;
+}
+
+.order-page .brand a {
+  display: inline-block;
+}
+
+.order-landing {
+  width: min(100%, 34rem);
+  margin: clamp(40px, 7vh, 72px) auto 0;
+  padding: clamp(28px, 6vw, 44px);
+  border: 1px solid rgba(47, 73, 55, 0.14);
+  border-radius: 28px;
+  background: #fffaf0;
+  box-shadow: 0 18px 48px rgba(47, 73, 55, 0.09);
+}
+
+.order-art {
+  display: block;
+  width: 130px;
+  height: auto;
+  margin: 0 auto 24px;
+}
+
+.order-landing h1 {
+  margin: 0;
+  font-size: clamp(36px, 9vw, 52px);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+}
+
+.order-status {
+  min-height: 1.5em;
+  margin: 18px 0 24px;
+  color: #52675b;
+  font-size: 20px;
+  line-height: 1.45;
+}
+
+.order-open-button {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 22px;
+  border-radius: 16px;
+  background: #2b4d3d;
+  color: #fffaf0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.order-open-button:hover { background: #203d30; }
+.order-open-button:active { transform: translateY(1px); }
+
+.order-help {
+  margin: 22px 0 0;
+  color: #52675b;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.order-page .site-footer {
+  margin-top: 36px;
+}
+
+@media (max-width: 480px) {
+  .order-page { padding-top: 28px; }
+  .order-landing {
+    margin-top: 32px;
+    padding: 28px 20px 30px;
+    border-radius: 22px;
+  }
+}
