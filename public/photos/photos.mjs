@@ -54,12 +54,12 @@ function render() {
 function receipt(complete) {
   const delivered = entries.filter(entry => entry.expires);
   const remaining = entries.length - delivered.length;
-  if (!delivered.length) return closed ? 'This request is closed. Ask for a new invitation.' : 'No photos uploaded. Check each photo and try again.';
+  if (!delivered.length) return closed ? 'This request is closed. We couldn’t confirm delivery. Ask the organizer which photos arrived.' : 'No uploads confirmed yet. Check each photo and try again.';
   const firstExpiry = new Date(Math.min(...delivered.map(entry => entry.expires)));
   const deadline = firstExpiry.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
   const pickedUp = `${delivered.length} photo${delivered.length === 1 ? ' is' : 's are'} ready for ${owner} to download by ${deadline}.`;
   if (!remaining || complete) return pickedUp;
-  return pickedUp + (closed ? ` The request closed before the other ${remaining} could be sent.` : ` ${remaining} still need to be sent.`);
+  return pickedUp + (closed ? ` The request closed before we could confirm the other ${remaining}.` : ` ${remaining} still need to be sent.`);
 }
 
 el('choose').onclick = () => el('files').click();
