@@ -188,9 +188,28 @@ a:focus-visible { outline: 3px solid #7a1f29; outline-offset: 5px; }
 
 .order-art {
   display: block;
-  width: 130px;
+  width: 94px;
   height: auto;
-  margin: 0 auto 24px;
+  margin: 0 auto 16px;
+}
+
+.order-landing [hidden] { display: none; }
+.order-reference {
+  margin: 0 0 8px;
+  font: 600 14px/1.4 system-ui, sans-serif;
+  color: #765746;
+}
+.order-qr {
+  width: 164px;
+  height: 164px;
+  image-rendering: pixelated;
+}
+.order-support {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 8px;
+  font: 600 15px/1.4 system-ui, sans-serif;
 }
 
 .order-landing h1 {

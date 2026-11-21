@@ -19,20 +19,14 @@
       </a>
     </header>
     <main class="order-landing">
-      <img class="order-art" src="/assets/santa-books-mail.png" width="260" height="266"
-           alt="A handmade clay Christmas tree beside a reindeer in a red scarf">
-      <h1>View your Santa Books order</h1>
-      <p id="order-status" class="order-status" aria-live="polite">Opening Santa Books…</p>
-      <a id="open-santa-books" class="order-open-button" href="santabooks://orders">
-        Open Santa Books
-      </a>
-      <p class="order-help">
-        If an older version opens without this order, update Santa Books and try the link again.
-        You can also open Santa Books and choose Settings, then Orders.
-      </p>
-      <noscript>
-        <p class="order-help">JavaScript is off. Use the button above, then choose Settings and Orders in Santa Books.</p>
-      </noscript>
+      <img class="order-art" src="/assets/santa-books-mail.png" width="260" height="266" alt="">
+      <p id="order-reference" class="order-reference" hidden></p>
+      <h1 id="order-heading">Your Santa Books order</h1>
+      <p id="order-status" class="order-status">Open Santa Books on your iPhone or iPad and choose Settings → Orders.</p>
+      <canvas id="order-qr" class="order-qr" role="img" aria-label="Scan to open your Santa Books order on iPhone or iPad" hidden></canvas>
+      <a id="open-santa-books" class="order-open-button" href="santabooks://orders" hidden>Open Santa Books</a>
+      <p id="order-fallback" class="order-help" hidden>Or open Santa Books and choose Settings → Orders.</p>
+      <a class="order-support" href="/support/">Get help with your order</a>
     </main>
     <footer class="site-footer">
       <nav aria-label="Footer">
