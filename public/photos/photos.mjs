@@ -1,8 +1,10 @@
 import { printableJPEG } from './jpeg.mjs';
+import { retryRateLimited } from './retry.mjs';
 
 const el = id => document.getElementById(id);
 const entries = [];
-let relay, token, owner, sending = false, closed = false;
+let relay, token, owner, sending = false, closed = false, selectionExpanded = false;
+const collapsedSelectionCount = 6;
 const nameSegments = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter(undefined, { granularity: 'grapheme' }) : null;
 const nameLength = value => nameSegments ? Array.from(nameSegments.segment(value)).length : Array.from(value).length;
 
@@ -14,6 +16,7 @@ async function call(options, upload = false) {
     const messages = { 410: 'This request is closed.', 413: 'This photo exceeds the upload limit.', 429: 'The upload limit has been reached. Try again later.', 415: 'This photo format could not be accepted.' };
     const error = new Error(messages[response.status] || 'Could not send. Try again.');
     error.status = response.status;
+    if (response.status === 429) error.retryAfter = response.headers.get('Retry-After');
     throw error;
   }
   return response.json();
@@ -21,7 +24,10 @@ async function call(options, upload = false) {
 
 function render() {
   const pending = entries.filter(entry => !entry.expires);
-  el('selection').replaceChildren(...entries.map((entry, index) => {
+  const delivered = entries.filter(entry => entry.expires).length;
+  if (entries.length <= collapsedSelectionCount) selectionExpanded = false;
+  const visibleEntries = selectionExpanded ? entries : entries.slice(0, collapsedSelectionCount);
+  el('selection').replaceChildren(...visibleEntries.map((entry, index) => {
     const item = document.createElement('li');
     const image = document.createElement('img');
     image.src = entry.preview;
@@ -42,6 +48,12 @@ function render() {
     }
     return item;
   }));
+  el('selection-summary').hidden = !entries.length;
+  el('selection-count').textContent = `${entries.length} photo${entries.length === 1 ? '' : 's'} selected${delivered ? ` · ${delivered} uploaded` : ''}`;
+  el('selection-toggle').hidden = entries.length <= collapsedSelectionCount;
+  el('selection-toggle').textContent = selectionExpanded ? 'Show fewer' : 'Show all';
+  el('selection-toggle').setAttribute('aria-expanded', String(selectionExpanded));
+  el('selection-toggle').setAttribute('aria-label', selectionExpanded ? `Show only the first ${collapsedSelectionCount} of ${entries.length} selected photos` : `Show all ${entries.length} selected photos`);
   el('choose').textContent = entries.length ? 'Choose more photos' : 'Choose photos';
   el('choose').classList.toggle('secondary', entries.length > 0);
   el('choose').disabled = sending || closed;
@@ -51,18 +63,27 @@ function render() {
   el('send').textContent = sending ? 'Sending…' : `${entries.some(entry => entry.attempted) ? 'Retry' : 'Send'} ${pending.length} photo${pending.length === 1 ? '' : 's'}`;
 }
 
-function receipt(complete) {
+function receipt() {
   const delivered = entries.filter(entry => entry.expires);
   const remaining = entries.length - delivered.length;
-  if (!delivered.length) return closed ? 'This request is closed. We couldn’t confirm delivery. Ask the organizer which photos arrived.' : 'No uploads confirmed yet. Check each photo and try again.';
-  const firstExpiry = new Date(Math.min(...delivered.map(entry => entry.expires)));
-  const deadline = firstExpiry.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-  const pickedUp = `${delivered.length} photo${delivered.length === 1 ? ' is' : 's are'} ready for ${owner} to download by ${deadline}.`;
-  if (!remaining || complete) return pickedUp;
-  return pickedUp + (closed ? ` The request closed before we could confirm the other ${remaining}.` : ` ${remaining} still need to be sent.`);
+  const messages = [];
+  if (delivered.length) {
+    const firstExpiry = new Date(Math.min(...delivered.map(entry => entry.expires)));
+    const deadline = firstExpiry.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    messages.push(`Sent ${delivered.length} photo${delivered.length === 1 ? '' : 's'} to ${owner}. ${delivered.length === 1 ? 'It' : 'They'} can be downloaded until ${deadline}.`);
+  } else {
+    messages.push('We couldn’t confirm that any photos were sent.');
+  }
+  if (closed) {
+    if (remaining) messages.push(`The request closed before we could confirm the other ${remaining}. Ask the organizer which photos arrived.`);
+    return messages.join('\n');
+  }
+  if (remaining) messages.push(`${remaining} photo${remaining === 1 ? ' still needs' : 's still need'} to be sent.`);
+  return messages.join('\n');
 }
 
 el('choose').onclick = () => el('files').click();
+el('selection-toggle').onclick = () => { selectionExpanded = !selectionExpanded; render(); el('selection-toggle').focus(); };
 el('files').onchange = () => {
   for (const file of el('files').files) {
     if (entries.length >= 100) { el('status').textContent = 'Choose up to 100 photos per batch.'; break; }
@@ -92,8 +113,15 @@ el('request').onsubmit = async event => {
         // Retain the exact bytes for a lost-response retry on this page.
         entry.jpeg ??= await printableJPEG(entry.file);
         entry.attempted = true;
-        const ack = await call({ headers: { 'Content-Type': 'image/jpeg', 'X-Request-Token': token,
-          'X-Photo-ID': entry.id, 'X-Sender-Name': encodeURIComponent(name) }, body: entry.jpeg }, true);
+        const ack = await retryRateLimited(
+          () => call({ headers: { 'Content-Type': 'image/jpeg', 'X-Request-Token': token,
+            'X-Photo-ID': entry.id, 'X-Sender-Name': encodeURIComponent(name) }, body: entry.jpeg }, true),
+          { onWait: delay => {
+            const seconds = Math.max(1, Math.ceil(delay / 1_000));
+            const sent = entries.filter(photo => photo.expires).length;
+            el('status').textContent = `${sent} of ${entries.length} sent. Sending will resume in ${seconds} second${seconds === 1 ? '' : 's'}. Keep this page open.`;
+          } }
+        );
         const expires = Date.parse(ack.expiresAt);
         if (!Number.isFinite(expires)) throw new Error('Could not confirm this upload. Try again.');
         entry.expires = expires;
@@ -109,17 +137,19 @@ el('request').onsubmit = async event => {
     sending = false;
     render();
   }
-  const complete = entries.every(entry => entry.expires);
-  el('status').textContent = receipt(complete);
+  const complete = entries.length > 0 && entries.every(entry => entry.expires);
+  el('status').textContent = receipt();
   if (complete || closed) {
     el('request').hidden = true;
     el('again').hidden = closed;
+    for (const entry of entries) URL.revokeObjectURL(entry.preview);
+    entries.length = 0;
+    selectionExpanded = false;
+    render();
   }
 };
 
 el('again').onclick = () => {
-  for (const entry of entries) URL.revokeObjectURL(entry.preview);
-  entries.length = 0;
   el('status').textContent = '';
   el('again').hidden = true;
   el('request').hidden = false;

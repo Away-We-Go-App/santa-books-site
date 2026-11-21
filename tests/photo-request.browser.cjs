@@ -67,9 +67,20 @@ for (const [engine, browserType] of Object.entries({ chromium, webkit })) {
       assert.equal(ids.length, 3);
       assert.notEqual(ids[0], ids[1]);
       assert.equal(ids[1], ids[2]);
-      assert.match(await page.locator('#status').innerText(), /2 photos are ready for Alex/);
+      assert.match(await page.locator('#status').innerText(), /Sent 2 photos to Alex/);
       await page.locator('#again').click();
       assert.equal(await page.locator('#name').inputValue(), 'June');
+      await page.locator('#files').setInputFiles(Array.from({ length: 21 }, (_, i) =>
+        ({ name: `photo-${i}.webp`, buffer: sample, mimeType: 'image/webp' })));
+      const thumbnails = page.locator('#selection li');
+      assert.equal(await thumbnails.count(), 6);
+      const send = page.getByRole('button', { name: 'Send 21 photos' });
+      const bounds = await send.boundingBox();
+      assert.ok(bounds && bounds.y >= 0 && bounds.y + bounds.height <= page.viewportSize().height);
+      await page.getByRole('button', { name: 'Show all 21 selected photos' }).click();
+      assert.equal(await thumbnails.count(), 21);
+      await page.locator('#selection-toggle').click();
+      assert.equal(await thumbnails.count(), 6);
       closed = true;
       await page.reload();
       await page.getByRole('heading', { name: 'This request is closed' }).waitFor();
